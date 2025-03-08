@@ -1,0 +1,23 @@
+# Node.js dependencies
+node_modules/
+
+# Build directories
+/dist
+/build
+
+# Environment variables
+.env
+
+# Logs
+*.log
+
+# OS and IDE specific files
+.DS_Store
+.vscode/
+.idea/
+*.swp
+
+# Debugger & test directories
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

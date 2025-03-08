@@ -4,14 +4,11 @@ import dotenv from 'dotenv';
 import { githubRoutes } from './routes/github/githubRoutes.js';
 import { commitRoutes } from './routes/commits/commitRoutes.js';
 import { errorHandler } from './helper/errorHelper.js';
+import { corsOption } from './helper/corsHelper.js';
 const app = express();
 app.use(express.json());
 dotenv.config()
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', ['http://localhost:5173','https://my-changelog-app.vercel.app']);
-    res.header('Access-Control-Allow-Headers', 'Content-Type');
-    next();
-});
+app.use(corsOption);
 
 app.use(githubRoutes);
 app.use("/commits", commitRoutes);

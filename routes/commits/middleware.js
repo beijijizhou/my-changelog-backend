@@ -34,10 +34,43 @@ const extractCommitMessages = (req, res, next) => {
 
     // Extract commit messages
     const commitMessages = commits.map(commit => commit.commit.message);
-    console.log(commitMessages)
     req.commitMessages = commitMessages; // Attach commit messages to the request object
     next(); // Pass control to the next middleware or route handler
 };
 
 
-export const commitMiddlewares = [fetchCommits, extractCommitMessages]
+export const summarizeCommitMessages = async (req, res, next) => {
+    const { commitMessages } = req;
+
+    if (!commitMessages || commitMessages.length === 0) {
+        return res.status(404).json({ error: 'No commit messages available to summarize' });
+    }
+
+    const commitMessagesText = commitMessages.join('\n'); // Join messages into a single string
+
+    try {
+        const geminiApiKey = process.env.GOOGLE_GEMINI_API_KEY; // Replace with your Gemini API key
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiApiKey}`;
+
+        const response = await axios.post(url, {
+            contents: [{
+                parts: [{
+                    text: `Summarize the following commit messages:\n${commitMessagesText}`
+                }]
+            }]
+        }, {
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+        // Attach the summarized commit messages to the request object
+        req.commitSummary = response.data.candidates[0].content.parts;
+        console.log(req.commitSummary)
+        next(); // Pass control to the next middleware or route handler
+    } catch (error) {
+        console.error('Error summarizing commits:', error.response?.data || error.message);
+        return res.status(500).json({ error: 'Failed to summarize commits' });
+    }
+};
+
+export const commitMiddlewares = [fetchCommits, extractCommitMessages, summarizeCommitMessages]

@@ -55,7 +55,7 @@ export const summarizeCommitMessages = async (req, res, next) => {
         const response = await axios.post(url, {
             contents: [{
                 parts: [{
-                    text: `Summarize the following commit messages:\n${commitMessagesText}`
+                    text: `Summarize the following commit messages in html fashion so that I can display it in the website automatically:\n${commitMessagesText}`
                 }]
             }]
         }, {
@@ -65,7 +65,7 @@ export const summarizeCommitMessages = async (req, res, next) => {
         });
         // Attach the summarized commit messages to the request object
         req.commitSummary = response.data.candidates[0].content.parts;
-        console.log(req.commitSummary)
+        
         next(); // Pass control to the next middleware or route handler
     } catch (error) {
         console.error('Error summarizing commits:', error.response?.data || error.message);

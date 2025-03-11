@@ -68,7 +68,7 @@ export const summarizeCommitMessages = async (req, res, next) => {
     try {
         const geminiApiKey = process.env.GOOGLE_GEMINI_API_KEY; // Replace with your Gemini API key
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiApiKey}`;
-        const prompt = `Summarize the following commit messages in HTML format for React-Quill display. Use <h2> for section titles and <ul><li> for listing important changes. Return only the raw HTML without markdown-style code blocks or backticks:\n${commitMessagesText}`;
+        const prompt = `Summarize the following commit messages in HTML format for React-Quill display. Use <h2> for section titles and <ul><li> for listing important changes. Return only the raw HTML, No backticks!!:\n${commitMessagesText}`;
         const response = await axios.post(url, {
             contents: [{
                 parts: [{

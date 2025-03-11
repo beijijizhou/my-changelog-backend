@@ -9,7 +9,6 @@ const commitRoutes = express.Router();
 commitRoutes.get('/:owner/:repo', commitMiddlewares, (req, res) => {
     const commitMessages = req.commitMessages;
     const commitSummary = req.commitSummary[0].text;
-    console.log(commitMessages, commitSummary)
     return res.status(200).json({
         commitMessages,
         commitSummary

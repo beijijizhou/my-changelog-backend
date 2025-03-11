@@ -7,7 +7,6 @@ const fetchCommits = async (req, res, next) => {
     if (!githubToken) {
         return res.status(401).json({ error: 'Unauthorized, no token available' });
     }
-    console.log(owner, repo, githubToken)
     try {
         const response = await axios.get(
             `https://api.github.com/repos/${owner}/${repo}/commits`,
@@ -34,6 +33,24 @@ const extractCommitMessages = (req, res, next) => {
 
     // Extract commit messages
     const commitMessages = commits.map(commit => commit.commit.message);
+    const commitDetails = commits.map(commit => ({
+        message: commit.commit.message,
+        date: commit.commit.author.date
+    }));
+    commitDetails.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    // Group commits by date
+    const groupedCommits = commitDetails.reduce((acc, commit) => {
+        const commitDate = commit.date.split('T')[0]; // Extract the date part (YYYY-MM-DD)
+        if (!acc[commitDate]) {
+            acc[commitDate] = [];
+        }
+        acc[commitDate].push(commit);
+        return acc;
+    }, {});
+
+    req.groupedCommits = groupedCommits; 
+    console.log(groupedCommits)
     req.commitMessages = commitMessages; // Attach commit messages to the request object
     next(); // Pass control to the next middleware or route handler
 };
@@ -51,11 +68,11 @@ export const summarizeCommitMessages = async (req, res, next) => {
     try {
         const geminiApiKey = process.env.GOOGLE_GEMINI_API_KEY; // Replace with your Gemini API key
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiApiKey}`;
-
+        const prompt = `Summarize the following commit messages in HTML format for React-Quill display. Use <h2> for section titles and <ul><li> for listing important changes. Return only the raw HTML without markdown-style code blocks or backticks:\n${commitMessagesText}`;
         const response = await axios.post(url, {
             contents: [{
                 parts: [{
-                    text: `Summarize the following commit messages in html fashion so that I can display it in the website automatically:\n${commitMessagesText}`
+                    text: prompt,
                 }]
             }]
         }, {

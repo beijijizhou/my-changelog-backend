@@ -1,7 +1,7 @@
 
 import express from 'express'; // Default import for Express
 import dotenv from 'dotenv';
-import { githubRoutes } from './routes/github/githubRoutes.js';
+import { githubRoutes } from './routes/github/routes.js';
 import { commitRoutes } from './routes/commits/routes.js';
 import { errorHandler } from './helper/errorHelper.js';
 import { corsOption } from './helper/corsHelper.js';

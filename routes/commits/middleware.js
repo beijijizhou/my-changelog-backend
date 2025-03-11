@@ -56,7 +56,7 @@ const extractCommitMessages = (req, res, next) => {
 
 
 export const summarizeCommitMessages = async (req, res, next) => {
-    const { commitMessages } = req;
+    const { commitMessages } = req.body;
 
     if (!commitMessages || commitMessages.length === 0) {
         return res.status(404).json({ error: 'No commit messages available to summarize' });
@@ -89,4 +89,4 @@ export const summarizeCommitMessages = async (req, res, next) => {
     }
 };
 
-export const commitMiddlewares = [fetchCommits, extractCommitMessages, summarizeCommitMessages]
+export const commitMiddlewares = [fetchCommits, extractCommitMessages]

@@ -1,5 +1,3 @@
-// src/utils/github.js
-
 import axios from "axios";
 const fetchCommits = async (req, res, next) => {
     const { owner, repo } = req.params;
@@ -30,26 +28,10 @@ const extractCommitMessages = (req, res, next) => {
     if (!commits || commits.length === 0) {
         return res.status(404).json({ error: 'No commits found' });
     }
-
-    // Extract commit messages
-    const commitMessages = commits.map(commit => commit.commit.message);
-    const commitDetails = commits.map(commit => ({
+    const commitMessages = commits.map(commit => ({
         message: commit.commit.message,
-        date: commit.commit.author.date
+        date: commit.commit.author.date, // Extract the commit date
     }));
-    commitDetails.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-    // Group commits by date
-    const recentCommits = commitDetails.reduce((acc, commit) => {
-        const commitDate = commit.date.split('T')[0]; // Extract the date part (YYYY-MM-DD)
-        if (!acc[commitDate]) {
-            acc[commitDate] = [];
-        }
-        acc[commitDate].push(commit);
-        return acc;
-    }, {});
-
-    req.recentCommits = recentCommits; 
     req.commitMessages = commitMessages; // Attach commit messages to the request object
     next(); // Pass control to the next middleware or route handler
 };
@@ -81,7 +63,7 @@ export const summarizeCommitMessages = async (req, res, next) => {
         });
         // Attach the summarized commit messages to the request object
         req.commitSummary = response.data.candidates[0].content.parts;
-        
+
         next(); // Pass control to the next middleware or route handler
     } catch (error) {
         console.error('Error summarizing commits:', error.response?.data || error.message);

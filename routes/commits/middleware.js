@@ -39,13 +39,11 @@ const extractCommitMessages = (req, res, next) => {
 
 export const summarizeCommitMessages = async (req, res, next) => {
     const { commitMessages } = req.body;
-
     if (!commitMessages || commitMessages.length === 0) {
         return res.status(404).json({ error: 'No commit messages available to summarize' });
     }
-
+    console.log(commitMessages)
     const commitMessagesText = commitMessages.join('\n'); // Join messages into a single string
-
     try {
         const geminiApiKey = process.env.GOOGLE_GEMINI_API_KEY; // Replace with your Gemini API key
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiApiKey}`;
@@ -62,7 +60,7 @@ export const summarizeCommitMessages = async (req, res, next) => {
             }
         });
         // Attach the summarized commit messages to the request object
-        req.commitSummary = response.data.candidates[0].content.parts;
+        req.commitSummary = response.data.candidates[0].content.parts[0].text;
 
         next(); // Pass control to the next middleware or route handler
     } catch (error) {

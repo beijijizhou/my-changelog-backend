@@ -5,9 +5,12 @@ import { githubRoutes } from './routes/github/routes.js';
 import { commitRoutes } from './routes/commits/routes.js';
 import { errorHandler } from './helper/errorHelper.js';
 import { corsOption } from './helper/corsHelper.js';
-const app = express();
-app.use(express.json());
+import { connectDB } from './db/connect.js';
 dotenv.config()
+const app = express();
+connectDB();
+app.use(express.json());
+
 app.use(corsOption);
 
 app.use(githubRoutes);

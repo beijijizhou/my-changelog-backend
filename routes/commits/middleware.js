@@ -40,7 +40,7 @@ const extractCommitMessages = (req, res, next) => {
     commitDetails.sort((a, b) => new Date(b.date) - new Date(a.date));
 
     // Group commits by date
-    const groupedCommits = commitDetails.reduce((acc, commit) => {
+    const recentCommits = commitDetails.reduce((acc, commit) => {
         const commitDate = commit.date.split('T')[0]; // Extract the date part (YYYY-MM-DD)
         if (!acc[commitDate]) {
             acc[commitDate] = [];
@@ -49,8 +49,8 @@ const extractCommitMessages = (req, res, next) => {
         return acc;
     }, {});
 
-    req.groupedCommits = groupedCommits; 
-    console.log(groupedCommits)
+    req.recentCommits = recentCommits; 
+    console.log(recentCommits)
     req.commitMessages = commitMessages; // Attach commit messages to the request object
     next(); // Pass control to the next middleware or route handler
 };

@@ -1,9 +1,9 @@
 import express from 'express';
-import { fetchAccessToken,fetchRepositories } from './middleware.js';
+import { githubMiddleware } from './middleware.js';
 
 const githubRoutes = express.Router();
 
-githubRoutes.post('/callback', fetchAccessToken, fetchRepositories, (req, res) => {
+githubRoutes.post('/callback', githubMiddleware, (req, res) => {
   return res.json({ token: req.accessToken, repos: req.repos });
 });
 

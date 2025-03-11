@@ -50,7 +50,6 @@ const extractCommitMessages = (req, res, next) => {
     }, {});
 
     req.recentCommits = recentCommits; 
-    console.log(recentCommits)
     req.commitMessages = commitMessages; // Attach commit messages to the request object
     next(); // Pass control to the next middleware or route handler
 };

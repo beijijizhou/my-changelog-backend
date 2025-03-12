@@ -14,22 +14,24 @@ const summarySchema = new mongoose.Schema({
   },
   summaries: [
     {
-      commitID: {
-        type: String,
-        required: true,
-        trim: true
-      },
-      message: {
-        type: String,
-        required: true
+      commit: {
+        id: {
+          type: String,
+          required: true,
+          trim: true
+        },
+        message: {
+          type: String,
+          required: true
+        },
+        date: {
+          type: Date,
+          default: Date.now
+        }
       },
       summary: {
         type: String,
         required: true
-      },
-      createdAt: {
-        type: Date,
-        default: Date.now
       }
     }
   ]

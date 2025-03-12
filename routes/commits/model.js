@@ -1,41 +1,43 @@
-// summaryModel.js
 import mongoose from "mongoose";
+
 // Define the Summary schema
 const summarySchema = new mongoose.Schema({
   owner: {
     type: String,
     required: true,
-    trim: true // Removes leading/trailing whitespace
+    trim: true
   },
   repo: {
     type: String,
     required: true,
     trim: true
   },
-  commitID: {
-    type: String,
-    required: true,
-    trim: true // GitHub SHA is a string
-  },
-  message: {
-    type: String,
-    required: true // The commit message
-  },
-  summary: {
-    type: String,
-    required: true // The generated summary
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  }
+  summaries: [
+    {
+      commitID: {
+        type: String,
+        required: true,
+        trim: true
+      },
+      message: {
+        type: String,
+        required: true
+      },
+      summary: {
+        type: String,
+        required: true
+      },
+      createdAt: {
+        type: Date,
+        default: Date.now
+      }
+    }
+  ]
 }, {
-  timestamps: true // Adds createdAt and updatedAt fields
+  timestamps: true
 });
 
-// Create a compound index to ensure owner + repo + commitID is unique
-summarySchema.index({ owner: 1, repo: 1, commitID: 1 }, { unique: true });
+// Ensure owner + repo is unique
+summarySchema.index({ owner: 1, repo: 1 }, { unique: true });
 
-// Create and export the Summary model
-export const Summary = mongoose.model('Summary', summarySchema);
-
+export const Summary = mongoose.model("Summary", summarySchema);

@@ -1,6 +1,6 @@
 import axios from "axios";
 const fetchCommits = async (req, res, next) => {
-    const { owner, repo } = req.params;
+    const { owner, repo } = req;
     const githubToken = req.headers.authorization || '';
     if (!githubToken) {
         return res.status(401).json({ error: 'Unauthorized, no token available' });
@@ -71,13 +71,13 @@ export const summarizeCommitMessages = async (req, res, next) => {
 };
 export const ownerAndRepoValidation = (req, res, next) => {
     const { owner, repo } = req.params;
-    console.log(req.params)
-    // Check if owner and repo are provided
     if (!owner || !repo) {
         return res.status(400).json({
             error: 'Both owner and repo are required in the URL path (e.g., /:owner/:repo)'
         });
     }
+    req.owner = owner;
+    req.repo = repo;
     next();
 };
 

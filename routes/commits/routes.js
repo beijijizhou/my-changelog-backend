@@ -1,7 +1,9 @@
 import express from 'express';
-import { commitMiddlewares, summarizeCommitMessages } from './middleware.js';
-import { getAllCommits, getCommitSummary } from './controller.js';
+import { commitMiddlewares, summarizeCommitMessages, ownerAndRepoValidation } from './middleware.js';
+import { getAllCommits, getCommitSummary, saveSummary } from './controller.js';
 const commitRoutes = express.Router();
+commitRoutes.use('/:owner/:repo', ownerAndRepoValidation);
 commitRoutes.get('/:owner/:repo', commitMiddlewares, getAllCommits);
-commitRoutes.post('/summary', summarizeCommitMessages, getCommitSummary)
+commitRoutes.post('/:owner/:repo',  saveSummary);
+commitRoutes.get('/:owner/:repo/summary', summarizeCommitMessages, getCommitSummary)
 export { commitRoutes };

@@ -1,7 +1,7 @@
 import axios from "axios";
 const fetchCommits = async (req, res, next) => {
     const { owner, repo } = req.params;
-    const githubToken = req.headers.authorization || ''; // Assuming the token is passed in the Authorization header
+    const githubToken = req.headers.authorization || '';
     if (!githubToken) {
         return res.status(401).json({ error: 'Unauthorized, no token available' });
     }
@@ -29,6 +29,7 @@ const extractCommitMessages = (req, res, next) => {
         return res.status(404).json({ error: 'No commits found' });
     }
     const commitMessages = commits.map(commit => ({
+        id: commit.sha,
         message: commit.commit.message,
         date: commit.commit.author.date, // Extract the commit date
     }));
@@ -38,11 +39,11 @@ const extractCommitMessages = (req, res, next) => {
 
 
 export const summarizeCommitMessages = async (req, res, next) => {
-    const { commitMessages } = req.body;
+    let { commitMessages } = req.body;
     if (!commitMessages || commitMessages.length === 0) {
         return res.status(404).json({ error: 'No commit messages available to summarize' });
     }
-    console.log(commitMessages)
+    commitMessages = commitMessages.map(commit => commit.message);
     const commitMessagesText = commitMessages.join('\n'); // Join messages into a single string
     try {
         const geminiApiKey = process.env.GOOGLE_GEMINI_API_KEY; // Replace with your Gemini API key
@@ -67,6 +68,17 @@ export const summarizeCommitMessages = async (req, res, next) => {
         console.error('Error summarizing commits:', error.response?.data || error.message);
         return res.status(500).json({ error: 'Failed to summarize commits' });
     }
+};
+export const ownerAndRepoValidation = (req, res, next) => {
+    const { owner, repo } = req.params;
+    console.log(req.params)
+    // Check if owner and repo are provided
+    if (!owner || !repo) {
+        return res.status(400).json({
+            error: 'Both owner and repo are required in the URL path (e.g., /:owner/:repo)'
+        });
+    }
+    next();
 };
 
 export const commitMiddlewares = [fetchCommits, extractCommitMessages]

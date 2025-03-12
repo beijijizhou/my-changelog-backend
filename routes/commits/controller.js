@@ -1,3 +1,4 @@
+import { Summary } from "./model.js";
 export const getAllCommits = (req, res) => {
     const commitMessages = req.commitMessages;
     return res.status(200).json({
@@ -10,3 +11,8 @@ export const getCommitSummary = async (req, res) => {
         summary
     });
 };
+
+export const saveSummary = async (req, res) => {
+   
+    return res.status(201).json()
+}

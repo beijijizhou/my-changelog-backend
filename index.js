@@ -7,6 +7,7 @@ import { errorHandler } from './helper/errorHelper.js';
 import { corsOption } from './helper/corsHelper.js';
 import { connectDB } from './db/connect.js';
 import { ownerAndRepoValidation } from './routes/commits/middleware.js';
+import { summaryRoutes } from './routes/summary/routes.js';
 dotenv.config()
 const app = express();
 connectDB();
@@ -16,6 +17,7 @@ app.use(corsOption);
 
 app.use(githubRoutes);
 app.use("/commits/:owner/:repo", ownerAndRepoValidation, commitRoutes);
+app.use("/summaries/:owner/:repo", ownerAndRepoValidation, summaryRoutes);
 app.use(errorHandler);
 app.get("/", (req, res) => {
     return res.json({ message: "welcome" })

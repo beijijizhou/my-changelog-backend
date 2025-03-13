@@ -3,16 +3,12 @@ export const saveSummary = async (req, res) => {
     try {
       // Assume owner and repo come from req.params (adjust as needed)
       const { owner, repo } = req; // Or req.body, depending on your route
-      const { commit, summary } = req.body;
+      const { commits, summary } = req.body;
   
       // Validate input
-      if (!commit || !summary) {
+      if (!commits || !summary) {
         return res.status(400).json({ error: "Missing commit or summary" });
       }
-      if (!commit.id || !commit.message || !commit.date) {
-        return res.status(400).json({ error: "Commit must include id, message, and date" });
-      }
-  
       // Find the summary document for the given owner/repo
       let summaryDoc = await Summary.findOne({ owner, repo });
   
@@ -21,10 +17,10 @@ export const saveSummary = async (req, res) => {
         summaryDoc = new Summary({
           owner,
           repo,
-          summaries: [{ commit, summary }]
+          summaries: [{commits, summary }]
         });
       } else {
-        summaryDoc.summaries.push({ commit, summary });
+        summaryDoc.summaries.push({ commits, summary });
       }
       const savedDoc = await summaryDoc.save();
       return res.status(201).json({
@@ -42,7 +38,6 @@ export const getAllSummaries = async (req, res) => {
         const { owner, repo } = req; // Get owner and repo from the URL params
         // Find the summary document for the given owner and repo
         const summaryDoc = await Summary.findOne({ owner, repo });
-        console.log(summaryDoc)
         // Return an empty array if no document is found or if there are no summaries
         const summaries = summaryDoc ? summaryDoc.summaries : [];
 

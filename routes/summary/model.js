@@ -14,7 +14,7 @@ const summarySchema = new mongoose.Schema({
   },
   summaries: [
     {
-      commit: {
+      commits: [{
         id: {
           type: String,
           required: true,
@@ -28,7 +28,7 @@ const summarySchema = new mongoose.Schema({
           type: Date,
           default: Date.now
         }
-      },
+      }],
       summary: {
         type: String,
         required: true

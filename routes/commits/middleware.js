@@ -50,7 +50,8 @@ const extractCommitMessages = (req, res, next) => {
     const { commits } = req;
 
     if (!commits || commits.length === 0) {
-        return res.status(404).json({ error: 'No commits found' });
+        
+        return res.status(200).json({ commitMessages: null });
     }
     const commitMessages = commits.map(commit => ({
         id: commit.sha,

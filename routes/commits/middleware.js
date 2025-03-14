@@ -1,4 +1,25 @@
 import axios from "axios";
+import { Summary } from "../summary/model.js";
+const getLatestCommitDate = async (req, res, next) => {
+    const { owner, repo } = req;
+    const DELAY_TIME = 1000;
+    try {
+        const summaryDoc = await Summary.findOne({ owner, repo });
+
+        if (!summaryDoc || summaryDoc.summaries.length === 0) {
+            req.latestCommitDate = undefined; // No summaries found
+            return next();
+        }
+        const lastCommit = summaryDoc.summaries[summaryDoc.summaries.length - 1].commits
+        const latestCommitDate = new Date(lastCommit[0].date);
+        const adjustedDate = new Date(latestCommitDate.getTime() + DELAY_TIME);
+        req.latestCommitDate = adjustedDate.toISOString(); 
+        next();
+    } catch (err) {
+        console.error('Error finding latest commit date:', err);
+        return res.status(500).json({ error: 'Failed to retrieve latest commit date' });
+    }
+};
 const fetchCommits = async (req, res, next) => {
     const { owner, repo } = req;
     const githubToken = req.headers.authorization || '';
@@ -11,6 +32,9 @@ const fetchCommits = async (req, res, next) => {
             {
                 headers: {
                     Authorization: githubToken,
+                },
+                params: {
+                    since: req.latestCommitDate, // Fetch commits after this date
                 },
             }
         );
@@ -81,4 +105,4 @@ export const ownerAndRepoValidation = (req, res, next) => {
     next();
 };
 
-export const commitMiddlewares = [fetchCommits, extractCommitMessages]
+export const commitMiddlewares = [getLatestCommitDate, fetchCommits, extractCommitMessages]

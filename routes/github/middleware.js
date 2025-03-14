@@ -21,6 +21,7 @@ export const fetchAccessToken = async (req, res, next) => {
     );
 
     req.accessToken = response.data.access_token;
+    console.log(req.accessToken)
     next(); // Proceed to the next middleware
   } catch (error) {
     console.error('Error on token: ');
@@ -28,11 +29,23 @@ export const fetchAccessToken = async (req, res, next) => {
   }
 };
 
+
 export const fetchRepositories = async (req, res, next) => {
-  const { accessToken } = req;
+  let { accessToken } = req;
+  const authorizationHeader = req.headers.authorization;
 
   if (!accessToken) {
-    return res.status(500).send('Error: Access token not obtained');
+    if (authorizationHeader) {
+      const token = authorizationHeader.split(' ')[1];
+      if (!token) {
+        console.error('Invalid Authorization header:', authorizationHeader);
+        return res.status(400).json({ error: 'Invalid Authorization header' });
+      }
+      accessToken = token;
+    } else {
+      console.error('No access token or Authorization header provided');
+      return res.status(401).json({ error: 'Unauthorized: Access token not provided' });
+    }
   }
 
   try {
@@ -41,19 +54,23 @@ export const fetchRepositories = async (req, res, next) => {
         Authorization: `Bearer ${accessToken}`,
       },
     });
-
-
-    req.repos = reposResponse.data; // Save repositories to the request object
-    next(); // Proceed to the next middleware or route handler
+    req.repos = reposResponse.data;
+    next();
   } catch (error) {
-    console.error('Error on repo:');
-    return res.status(500).send('Error on repo');
+    console.error('Error fetching repositories from GitHub:', {
+      status: error.response?.status,
+      data: error.response?.data,
+      message: error.message,
+    });
+    return res.status(500).json({
+      error: 'Failed to fetch repositories from GitHub',
+      details: error.response?.data || error.message,
+    });
   }
 };
 export const sortReposByLatestCommit = (req, res, next) => {
   try {
     const repos = req.repos; // Get the repos from the previous middleware
-    console.log("start to sort");
 
     // Sort the repositories based on the updated_at field
     repos.sort((a, b) => {

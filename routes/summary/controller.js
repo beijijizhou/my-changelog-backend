@@ -34,22 +34,32 @@ export const saveSummary = async (req, res) => {
 };
 
 export const getAllSummaries = async (req, res) => {
+  const { summaryDoc } = req;
+  return res.status(200).json({
+    message: 'Summaries found',
+    summaries: summaryDoc.summaries,
+  });
+
+};
+
+export const updateSummary = async (req, res) => {
+  const { id } = req.params;
+  const { summaryDoc } = req;
+  const { summary, commits } = req.body;
+  const summaryToUpdate = summaryDoc.summaries.id(id);
+  if (summary) summaryToUpdate.summary = summary;
+  if (commits) summaryToUpdate.commits = commits;
+
+  // Save the document
   try {
-    const { owner, repo } = req; // Get owner and repo from the URL params
-    // Find the summary document for the given owner and repo
-    const summaryDoc = await Summary.findOne({ owner, repo });
-    if (!summaryDoc || !summaryDoc.summaries.length) {
-      return res.status(200).json({
-        message: 'No summaries available for this repository',
-        summaries: null,
-      });
-    }
+    const updatedDoc = await summaryDoc.save();
     return res.status(200).json({
-      message: 'Summaries found',
-      summaries: summaryDoc.summaries,
+      message: "Summary updated successfully",
+      updatedDocument: updatedDoc, // Return the entire updated document
     });
   } catch (error) {
-    return res.status(500).json({ error: "Internal server error" });
+    console.error("Error updating summary:", error);
+    return res.status(500).json({ message: "Server error" });
   }
-};
+}
 

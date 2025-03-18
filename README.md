@@ -12,7 +12,7 @@
 ### Running the Application
 - Start the development server:
   ```sh
-  npm run dev
+  node index.js (nodemon index.js if you have nodemon installed)
   ```
 
 ## Environment Variables

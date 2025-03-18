@@ -62,4 +62,31 @@ export const updateSummary = async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 }
+export const deleteSummary = async (req, res) => {
+  const { id } = req.params;
+  const { summaryDoc } = req;
+
+  try {
+    // Find the subdocument in the summaries array by its _id
+    const summaryToDelete = summaryDoc.summaries.id(id);
+
+    if (!summaryToDelete) {
+      return res.status(404).json({ message: "Summary not found" });
+    }
+
+    // Remove the subdocument from the array using .pull()
+    summaryDoc.summaries.pull({ _id: id });
+
+    // Save the parent document to persist the change
+    await summaryDoc.save();
+
+    return res.status(200).json({
+      message: "Summary deleted successfully",
+      deletedId: id,
+    });
+  } catch (error) {
+    console.error("Error deleting summary:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
 
